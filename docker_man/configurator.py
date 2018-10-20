@@ -59,7 +59,6 @@ class Configurator(object):
             if not self._is_valid(self._config):
                 raise ValueError('Config file is not valid')
 
-
     def _is_valid(self, config) -> bool:
         try:
             for container in config.get('containers', None):
@@ -67,7 +66,8 @@ class Configurator(object):
                         or container.get('container_name', None) is None \
                         or container.get('build', None) is None \
                         or container.get('run', None) is None:
-                    raise Exception(f'Some of fields: name, run, build are not valid in record {container}')
+                    raise Exception(
+                        f'Some of fields: name, container_name, run, build are not valid in record {container}')
             return True
         except Exception as e:
             print('validation error ->', e)
