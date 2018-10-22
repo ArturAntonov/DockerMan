@@ -1,4 +1,4 @@
-# docker-man
+# docker_man
 Python tool for managing docker containers ( run, stop, rebuild and other operations).
 
 The main special ability is --rebuild and --restart operations for one or for all containers at once.
