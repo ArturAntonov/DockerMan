@@ -65,3 +65,13 @@ Example:
   ]
 }
 ```
+
+### Important note
+
+You should write a path to a Dockerfile depend on a directory from which you want to call the docker_man. 
+
+For example, a path to a Dockerfile is "best_service/Dockerfile", in this case, you should call the docker_man from root folder for the "best_service/Dockerfile".
+
+If you write the full path to a Dockerfile, then no matter from which directory you cal the docker_man.
+
+In other words, the docker_man see paths relatively itself.
