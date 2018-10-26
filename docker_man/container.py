@@ -6,6 +6,7 @@ from docker_man.command import Command
 
 
 class Container(object):
+    # todo commands should execute only for specified state. F.e. Command.RUN shouldn't execute when container is online
     commands_priority: Dict[Command, int] = {
         Command.STOP: 1,
         Command.SREMOVE: 2,
@@ -18,8 +19,8 @@ class Container(object):
 
     # todo replace try-except to process error handler
 
-    def __init__(self, name, container_name, build, run, description):
-        self._name = name
+    def __init__(self, alias, container_name, build, run, description):
+        self._alias = alias
         self._container_name = container_name
         self._run = run
         self._build = build
@@ -27,13 +28,32 @@ class Container(object):
         self._container_id = None
         self._commands: List[(Command, int)] = list()
         self._command_queue: List[Callable] = list()
+        self._state = None
 
     @property
-    def name(self):
-        return self._name
+    def alias(self):
+        return self._alias
+
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        allowed_values = ['online', 'offline']
+        if value not in allowed_values:
+            raise ValueError(
+                "Invalid value for `status` ({0}), must be one of {1}".format(value, allowed_values)
+            )
+
+        self._state = value
+
+    @property
+    def container_name(self):
+        return self._container_name
 
     def build(self):
-        print('build container', self._name)
+        print('build container', self._alias)
         try:
             command_tokens = [token for token in self._build.split(' ') if len(token) > 0]
             process = subprocess.run(command_tokens, check=True, shell=True)
@@ -42,7 +62,7 @@ class Container(object):
         print('end build process')
 
     def run(self):
-        print('run container', self._name)
+        print('run container', self._alias)
         try:
             command_tokens = [token for token in self._run.split(' ') if len(token) > 0]
             process = subprocess.run(command_tokens, check=True, shell=True)
@@ -55,7 +75,7 @@ class Container(object):
             process = subprocess.run(['docker', 'stop', self._container_name], check=True, shell=True)
         except subprocess.CalledProcessError as e:
             print('stop error', e)
-        print('stop container', self._name)
+        print('stop container', self._alias)
 
     def remove(self):
         # docker command for remove
@@ -63,25 +83,25 @@ class Container(object):
             process = subprocess.run(['docker', 'rm', self._container_name], check=True, shell=True)
         except subprocess.CalledProcessError as e:
             print('remove error', e)
-        print('remove container', self._name)
+        print('remove container', self._alias)
 
     def restart(self):
         self._append_to_queue(self._command_queue, self.stop)
         self._append_to_queue(self._command_queue, self.run)
-        print('restart container', self._name)
+        print('restart container', self._alias)
 
     def rebuild(self):
         self._append_to_queue(self._command_queue, self.stop)
         self._append_to_queue(self._command_queue, self.remove)
         self._append_to_queue(self._command_queue, self.build)
         self._append_to_queue(self._command_queue, self.run)
-        print('rebuild container', self._name)
+        print('rebuild container', self._alias)
 
     def sremove(self):
         # docker command for sremove
         self._append_to_queue(self._command_queue, self.stop)
         self._append_to_queue(self._command_queue, self.remove)
-        print('sremove container', self._name)
+        print('sremove container', self._alias)
 
     def set_command(self, command: Command):
         # make from commands list with commands and its priorities
@@ -128,15 +148,15 @@ class Container(object):
         For default tostring() behavior
         :return:
         """
-        return f'\nname: {self._name}, \nbuild: "{self._build}", \nrun: "{self._run}"'
+        return f'\nalias: {self._alias}, \nbuild: "{self._build}", \nrun: "{self._run}"'
 
     def __eq__(self, o: Any) -> bool:
         """
         Overrides the default implementation
         For equality behavior. For example, for compare in a set
         """
-        return self._name == o.name
+        return self._alias == o.alias
 
     def __hash__(self) -> int:
         """Overrides the default implementation"""
-        return hash(self._name + self._build + self._run)
+        return hash(self._alias + self._build + self._run)

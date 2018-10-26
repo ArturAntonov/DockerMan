@@ -62,7 +62,7 @@ class Configurator(object):
     def _is_valid(self, config) -> bool:
         try:
             for container in config.get('containers', None):
-                if container.get('name', None) is None \
+                if container.get('alias', None) is None \
                         or container.get('container_name', None) is None \
                         or container.get('build', None) is None \
                         or container.get('run', None) is None:

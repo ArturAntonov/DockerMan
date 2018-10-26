@@ -41,7 +41,7 @@ Used format of configuration file:
 {
     "containers": [
         {
-            "name": "[Required] this name uses for terminal calls",
+            "alias": "[Required] this alias uses for terminal calls",
             "container_name": "[Required] this name uses for docker commands call. It should be equal name from build and run commands.",
             "description": "[Optional] description for container. It uses for --containers command",
             "build": "[Required] command for build image",
@@ -56,7 +56,7 @@ Example:
 {
   "containers": [
     {
-      "name": "my_best_service",
+      "alias": "my_best_service",
       "container_name": "best_service",
       "description": "Container for my best service",
       "build": "docker build -t best_service -f best_service/Dockerfile .",

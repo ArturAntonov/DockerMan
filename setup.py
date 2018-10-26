@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 NAME = "docker_man"
-VERSION = "1.0.1"
+VERSION = "1.1.0"
 
 # To install the library, run the following
 #
@@ -14,10 +14,10 @@ VERSION = "1.0.1"
 setup(
     name=NAME,
     version=VERSION,
-    description="Docker-man tool for managing containers",
-    author="Artur Paulson",
+    description="Docker_man is the tool for managing docker containers",
+    author="Artur Antonov",
     author_email="artur.antonov@perfectart.com",
-    url="https://github.com/ArturAntonov/docker-man",
+    url="https://github.com/ArturAntonov/docker_man",
     license='MIT',
     keywords=["Docker", "Docker-man tools"],
     packages=find_packages(),
@@ -27,6 +27,6 @@ setup(
         ],
     },
     long_description="""\
-    This is a docker-man tool for managing docker containers (run, stop, rebuild, etc]
+    This is the docker_man tool for managing docker containers (run, stop, rebuild, restart, etc]
     """
 )

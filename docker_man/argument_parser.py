@@ -28,5 +28,6 @@ class ArgumentParser(object):
                             action='count')
 
         parser.add_argument('--containers', help='Show information about available containers', action='count')
+        parser.add_argument('--state', help='Show containers state "online/offline"', action='count')
         parser.add_argument('--configure', help='Path to container-config.json.', type=open)
         parser.add_argument('--config_clear', help='Clear configure file', action='count')
