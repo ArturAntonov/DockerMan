@@ -17,9 +17,20 @@ class Container(object):
         Command.REBUILD: 7,
     }
 
+    commands_restricted_state: Dict[Command, List[str]] = {
+        Command.STOP: ['offline', 'stopped'],
+        Command.SREMOVE: [],
+        Command.REMOVE: ['online'],
+        Command.BUILD: [],
+        Command.RUN: ['online'],
+        Command.RESTART: [],
+        Command.REBUILD: []
+    }
+
     # todo replace try-except to process error handler
 
     def __init__(self, alias, container_name, build, run, description):
+        self._container_id = None
         self._alias = alias
         self._container_name = container_name
         self._run = run
@@ -40,7 +51,7 @@ class Container(object):
 
     @state.setter
     def state(self, value):
-        allowed_values = ['online', 'offline']
+        allowed_values = ['online', 'offline', 'stopped']
         if value not in allowed_values:
             raise ValueError(
                 "Invalid value for `status` ({0}), must be one of {1}".format(value, allowed_values)
@@ -51,6 +62,14 @@ class Container(object):
     @property
     def container_name(self):
         return self._container_name
+
+    @property
+    def container_id(self):
+        return self._container_id
+
+    @container_id.setter
+    def container_id(self, value):
+        self._container_id = value
 
     def build(self):
         print('build container', self._alias)
@@ -64,7 +83,12 @@ class Container(object):
     def run(self):
         print('run container', self._alias)
         try:
-            command_tokens = [token for token in self._run.split(' ') if len(token) > 0]
+            run_command = self._run
+            if self._state in ['online', 'stopped']:
+                # we cannot run container with the same name
+                run_command = f'docker start {self._container_id}'
+
+            command_tokens = [token for token in run_command.split(' ') if len(token) > 0]
             process = subprocess.run(command_tokens, check=True, shell=True)
         except subprocess.CalledProcessError as e:
             print('run error', e)
@@ -72,7 +96,7 @@ class Container(object):
 
     def stop(self):
         try:
-            process = subprocess.run(['docker', 'stop', self._container_name], check=True, shell=True)
+            process = subprocess.run(['docker', 'stop', self._container_id], check=True, shell=True)
         except subprocess.CalledProcessError as e:
             print('stop error', e)
         print('stop container', self._alias)
@@ -80,7 +104,7 @@ class Container(object):
     def remove(self):
         # docker command for remove
         try:
-            process = subprocess.run(['docker', 'rm', self._container_name], check=True, shell=True)
+            process = subprocess.run(['docker', 'rm', self._container_id], check=True, shell=True)
         except subprocess.CalledProcessError as e:
             print('remove error', e)
         print('remove container', self._alias)
@@ -110,9 +134,16 @@ class Container(object):
     def activate_commands(self):
         # Sort commands by priority
         self._commands = sorted(self._commands, key=itemgetter(1))
+
+        # create a commands queue
         for command in self._commands:
             if self.commands_priority.get(command[0]) is None:
                 raise Exception('Unknown command')
+
+            # activate command only if it allowed
+            if self._state in self.commands_restricted_state.get(command[0]):
+                print(f'Command {command} is not allowed, because container is {self._state}')
+                continue
 
             if command[0] == Command.BUILD:
                 self._append_to_queue(self._command_queue, self.build)
