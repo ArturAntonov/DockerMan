@@ -92,7 +92,7 @@ class Engine(object):
     def _show_containers_states(self):
         print('\nContainers\' states:')
         for alias, container in self.containers.items():
-            print(f'--- {alias} is {container.state}')
+            print(f'--- {alias} is {container.state.name}')
 
     def _update_containers_meta(self):
         self._check_containers_status()

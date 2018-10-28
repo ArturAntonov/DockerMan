@@ -3,6 +3,7 @@ from operator import itemgetter
 from typing import List, Dict, Callable, Any
 
 from docker_man.command import Command
+from state import State
 
 
 class Container(object):
@@ -18,11 +19,11 @@ class Container(object):
     }
 
     commands_restricted_state: Dict[Command, List[str]] = {
-        Command.STOP: ['offline', 'stopped'],
+        Command.STOP: [State.OFFLINE, State.STOPPED],
         Command.SREMOVE: [],
-        Command.REMOVE: ['online'],
+        Command.REMOVE: [State.ONLINE],
         Command.BUILD: [],
-        Command.RUN: ['online'],
+        Command.RUN: [State.ONLINE],
         Command.RESTART: [],
         Command.REBUILD: []
     }
@@ -30,16 +31,15 @@ class Container(object):
     # todo replace try-except to process error handler
 
     def __init__(self, alias, container_name, build, run, description):
-        self._container_id = None
-        self._alias = alias
-        self._container_name = container_name
-        self._run = run
-        self._build = build
-        self._description = description
-        self._container_id = None
+        self._container_id: str = None
+        self._alias: str = alias
+        self._container_name: str = container_name
+        self._run: str = run
+        self._build: str = build
+        self._description: str = description
         self._commands: List[(Command, int)] = list()
         self._command_queue: List[Callable] = list()
-        self._state = None
+        self._state: State = None
 
     @property
     def alias(self):
@@ -50,8 +50,8 @@ class Container(object):
         return self._state
 
     @state.setter
-    def state(self, value):
-        allowed_values = ['online', 'offline', 'stopped']
+    def state(self, value: State):
+        allowed_values = [State.STOPPED, State.OFFLINE, State.ONLINE]
         if value not in allowed_values:
             raise ValueError(
                 "Invalid value for `status` ({0}), must be one of {1}".format(value, allowed_values)
@@ -84,7 +84,7 @@ class Container(object):
         print('run container', self._alias)
         try:
             run_command = self._run
-            if self._state in ['online', 'stopped']:
+            if self._state in [State.ONLINE, State.STOPPED]:
                 # we cannot run container with the same name
                 run_command = f'docker start {self._container_id}'
 

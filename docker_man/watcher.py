@@ -2,6 +2,8 @@ import subprocess
 import re
 from typing import Optional
 
+from state import State
+
 
 class Watcher(object):
     """
@@ -44,11 +46,11 @@ class Watcher(object):
 
                 status = tokens[self.docker_ps_headers['status']]
                 if 'Up' in status:
-                    meta['status'] = 'online'
+                    meta['status'] = State.ONLINE
                 elif 'Exited' in status:
-                    meta['status'] = 'stopped'
+                    meta['status'] = State.STOPPED
                 else:
-                    meta['status'] = 'offline'
+                    meta['status'] = State.OFFLINE
 
                 container_name = tokens[self.docker_ps_headers['names']]
                 self._containers_meta[container_name] = meta

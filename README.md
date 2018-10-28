@@ -5,6 +5,9 @@ The main special ability is --rebuild and --restart operations for one or for al
 
 Also you can use other commands for one or for all containers at once.
 
+All commands for each container append to a special Command queue. This queue sorts commands and prevent run mutually exclusive commands.
+
+For example, if you choose both of commands 'STOP' AND 'RESTART', the docker_man will execute only 'RESTART', because 'STOP' command includes in 'RESTART' etc.
 
 ## Install
 For install just run command:
