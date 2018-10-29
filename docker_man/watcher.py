@@ -57,7 +57,7 @@ class Watcher(object):
         except Exception as e:
             print('Watcher Error. docker ps has failed', e)
 
-    def get_status(self, container_name: str) -> str:
+    def get_status(self, container_name: str) -> State:
         """
             Method checks status of a container by its name.
         Args:
@@ -66,7 +66,7 @@ class Watcher(object):
         Returns:
             str: 'online' or 'offline' or 'stopped'
         """
-        return 'offline' if container_name not in self._containers_meta \
+        return State.OFFLINE if container_name not in self._containers_meta \
             else self._containers_meta[container_name]['status']
 
     def get_container_id(self, container_name: str) -> Optional[str]:
