@@ -46,6 +46,7 @@ class Engine(object):
         # read args and run containers command.
         self.send_commands(self.args)
         self.activate_commands(self._active_containers)
+        self._show_containers_states()
 
     def init_containers(self, config) -> Dict[str, Container]:
         containers = dict()

@@ -107,6 +107,7 @@ class Container(object):
         try:
             if self._container_id:
                 process = subprocess.run(['docker', 'rm', self._container_id], check=True, shell=True)
+                self._state = State.OFFLINE
         except subprocess.CalledProcessError as e:
             print('remove error', e)
         print('remove container', self._alias)
@@ -127,6 +128,7 @@ class Container(object):
         # docker command for sremove
         self._append_to_queue(self._command_queue, self.stop)
         self._append_to_queue(self._command_queue, self.remove)
+        self._container_id = None
         print('sremove container', self._alias)
 
     def set_command(self, command: Command):
