@@ -96,7 +96,8 @@ class Container(object):
 
     def stop(self):
         try:
-            process = subprocess.run(['docker', 'stop', self._container_id], check=True, shell=True)
+            if self._container_id:
+                process = subprocess.run(['docker', 'stop', self._container_id], check=True, shell=True)
         except subprocess.CalledProcessError as e:
             print('stop error', e)
         print('stop container', self._alias)
@@ -104,7 +105,8 @@ class Container(object):
     def remove(self):
         # docker command for remove
         try:
-            process = subprocess.run(['docker', 'rm', self._container_id], check=True, shell=True)
+            if self._container_id:
+                process = subprocess.run(['docker', 'rm', self._container_id], check=True, shell=True)
         except subprocess.CalledProcessError as e:
             print('remove error', e)
         print('remove container', self._alias)
