@@ -3,7 +3,7 @@ from typing import Dict, Set, List
 from docker_man.command import Command
 from docker_man.configurator import Configurator
 from docker_man.container import Container
-from watcher import Watcher
+from docker_man.watcher import Watcher
 
 
 class Engine(object):

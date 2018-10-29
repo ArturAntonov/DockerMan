@@ -2,7 +2,7 @@ import subprocess
 import re
 from typing import Optional
 
-from state import State
+from docker_man.state import State
 
 
 class Watcher(object):
