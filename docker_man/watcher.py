@@ -1,5 +1,5 @@
-import subprocess
 import re
+import subprocess
 from typing import Optional
 
 from docker_man.state import State
@@ -25,6 +25,22 @@ class Watcher(object):
     def __init__(self) -> None:
         self._containers_meta = {}
 
+    def get_status(self, container_name: str) -> State:
+        """
+            Method checks status of a container by its name.
+        Args:
+            container_name (str): the name of the container
+
+        Returns:
+            str: 'online' or 'offline' or 'stopped'
+        """
+        return State.OFFLINE if container_name not in self._containers_meta \
+            else self._containers_meta[container_name]['status']
+
+    def get_container_id(self, container_name: str) -> Optional[str]:
+        return self._containers_meta.get(container_name, {}).get('container_id', None)
+
+    def update_meta(self):
         # watch on docker ps list and save meta information for containers
         try:
             process = subprocess.run(['docker', 'ps', '-a'], check=True, shell=True, stdout=subprocess.PIPE,
@@ -56,18 +72,3 @@ class Watcher(object):
                 self._containers_meta[container_name] = meta
         except Exception as e:
             print('Watcher Error. docker ps has failed', e)
-
-    def get_status(self, container_name: str) -> State:
-        """
-            Method checks status of a container by its name.
-        Args:
-            container_name (str): the name of the container
-
-        Returns:
-            str: 'online' or 'offline' or 'stopped'
-        """
-        return State.OFFLINE if container_name not in self._containers_meta \
-            else self._containers_meta[container_name]['status']
-
-    def get_container_id(self, container_name: str) -> Optional[str]:
-        return self._containers_meta.get(container_name, {}).get('container_id', None)

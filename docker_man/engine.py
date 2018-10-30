@@ -10,7 +10,7 @@ class Engine(object):
     def __init__(self, args) -> None:
         self.args = args
         self.configurator = Configurator()
-        self.watcher = None
+        self.watcher = Watcher()
         self.containers: Dict[str, Container] = dict()
         self._active_containers: Set[Container] = set()
 
@@ -36,7 +36,6 @@ class Engine(object):
         self.containers = self.init_containers(self.configurator.config)
 
         # check status of all containers
-        self.watcher = Watcher()
         self._update_containers_meta()
 
         if self.args.state is not None:
@@ -48,8 +47,9 @@ class Engine(object):
         self.activate_commands(self._active_containers)
 
         # check status of all containers
-        self.watcher = Watcher()
         self._update_containers_meta()
+
+        # after all operations show result state
         self._show_containers_states()
 
     def init_containers(self, config) -> Dict[str, Container]:
@@ -100,5 +100,6 @@ class Engine(object):
             print(f'--- {alias} is {container.state.name}')
 
     def _update_containers_meta(self):
+        self.watcher.update_meta()
         self._check_containers_status()
         self._get_containers_ids()

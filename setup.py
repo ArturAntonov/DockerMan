@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 NAME = "docker_man"
-VERSION = "1.2.4"
+VERSION = "1.2.5"
 
 # To install the library, run the following
 #
